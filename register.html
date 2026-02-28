@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <style>
+    html,body{
+      margin:0;
+      padding:0;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      font-family: Arial, sans-serif;
+      background:#120012;
+    }
+
+    /* ⭐ Falling stars canvas */
+    #starsCanvas{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index:0;
+    }
+
+    body {
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .register-container {
+      position:relative;
+      z-index:2;
+
+      /* ✅ ONLY COLOR CHANGED */
+      background-color: rgba(255,160,200,0.85);
+
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(255,160,200,0.7);
+      width: 90%;
+      max-width: 350px;
+      text-align: center;
+    }
+
+    .register-container h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .register-container input[type="text"],
+    .register-container input[type="email"],
+    .register-container input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .register-container input[type="submit"],
+    .register-container .home-btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background 0.3s;
+    }
+
+    .register-container input[type="submit"] {
+      background-color: black;
+      color: white;
+    }
+
+    .register-container input[type="submit"]:hover,
+    .register-container .home-btn:hover {
+      background-color: #222;
+    }
+
+    .register-container .home-btn {
+      background-color: white;
+      color: black;
+    }
+
+    .register-container p {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .register-container a {
+      color: white;
+      text-decoration: underline;
+    }
+
+    .message {
+      margin-top: 5px;
+      padding: 5px 8px;
+      border-radius: 5px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .message.success {
+      background-color: rgba(255,255,255,0.25);
+      color: #ffffff;
+    }
+
+    .message.error {
+      background-color: rgba(255,0,90,0.35);
+      color: #fff3c4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ⭐ stars background -->
+  <canvas id="starsCanvas"></canvas>
+
+  <div class="register-container">
+    <h2>Register to SkillBarter</h2>
+    <form id="registerForm">
+      <input type="text" name="name" id="name" placeholder="Full Name" required>
+      <div id="nameMessage" class="message"></div>
+
+      <input type="email" name="email" id="email" placeholder="Email" required>
+      <div id="emailMessage" class="message"></div>
+
+      <input type="password" name="password" id="password" placeholder="Password" required>
+      <div id="passwordMessage" class="message"></div>
+
+      <input type="submit" value="Register">
+    </form>
+
+    <button class="home-btn" onclick="window.location.href='home.html'">Go to Home</button>
+    <div id="registerMessage" class="message"></div>
+    <p>Already have an account? <a href="login.html">Login</a></p>
+  </div>
+
+  <script>
+/* ---------- FALLING LIGHT‑PINK STARS ---------- */
+
+const canvas = document.getElementById("starsCanvas");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+const stars = [];
+const STAR_COUNT = 120;
+
+function createStar(){
+  return {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.8 + 0.6,
+    speed: Math.random() * 1.5 + 0.4,
+    alpha: Math.random() * 0.5 + 0.4
+  };
+}
+
+for(let i=0;i<STAR_COUNT;i++){
+  stars.push(createStar());
+}
+
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  stars.forEach(s=>{
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(255,170,200,"+s.alpha+")";
+    ctx.shadowColor = "rgba(255,150,200,0.9)";
+    ctx.shadowBlur = 8;
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fill();
+
+    s.y += s.speed;
+
+    if(s.y > canvas.height){
+      s.y = -5;
+      s.x = Math.random() * canvas.width;
+    }
+  });
+
+  requestAnimationFrame(drawStars);
+}
+
+drawStars();
+
+/* ---------- YOUR ORIGINAL REGISTER SCRIPT (UNCHANGED) ---------- */
+
+const registerForm = document.getElementById('registerForm');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const nameMessage = document.getElementById('nameMessage');
+const emailMessage = document.getElementById('emailMessage');
+const passwordMessage = document.getElementById('passwordMessage');
+const registerMessage = document.getElementById('registerMessage');
+
+nameInput.addEventListener('input', function() {
+  if(nameInput.value.trim().length < 3){
+    nameMessage.textContent = 'Name too short!';
+    nameMessage.className = 'message error';
+    nameMessage.style.display = 'block';
+  } else {
+    nameMessage.textContent = 'Valid!';
+    nameMessage.className = 'message success';
+    nameMessage.style.display = 'block';
+  }
+});
+
+emailInput.addEventListener('input', function() {
+  const emailValue = emailInput.value.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if(emailValue.length === 0){
+    emailMessage.style.display = 'none';
+  } else if(!emailRegex.test(emailValue)){
+    emailMessage.textContent = 'Invalid email format!';
+    emailMessage.className = 'message error';
+    emailMessage.style.display = 'block';
+  } else {
+    emailMessage.textContent = 'Valid!';
+    emailMessage.className = 'message success';
+    emailMessage.style.display = 'block';
+  }
+});
+
+passwordInput.addEventListener('input', function() {
+  const passValue = passwordInput.value.trim();
+
+  if(passValue.length === 0){
+    passwordMessage.style.display = 'none';
+  } else if(passValue.length < 4){
+    passwordMessage.textContent = 'Password too short (min 4 chars)';
+    passwordMessage.className = 'message error';
+    passwordMessage.style.display = 'block';
+  } else {
+    passwordMessage.textContent = 'Valid!';
+    passwordMessage.className = 'message success';
+    passwordMessage.style.display = 'block';
+  }
+});
+
+registerForm.addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  let users = JSON.parse(localStorage.getItem('users')) || [];
+
+  const exists = users.find(u => u.email === email);
+
+  if (exists) {
+    registerMessage.textContent = 'Email already registered!';
+    registerMessage.className = 'message error';
+    registerMessage.style.display = 'block';
+    return;
+  }
+
+  users.push({ name, email, password });
+  localStorage.setItem('users', JSON.stringify(users));
+
+  registerMessage.textContent = 'Registration successful for ' + name + '!';
+  registerMessage.className = 'message success';
+  registerMessage.style.display = 'block';
+
+  setTimeout(() => {
+    window.location.replace('login.html');
+  }, 1500);
+});
+  </script>
+</body>
+</html>

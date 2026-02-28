@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login-SkillBarter</title>
+  <style>
+    html,body{
+      margin:0;
+      padding:0;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      font-family: Arial, sans-serif;
+      background:#120012;
+    }
+
+    /* ⭐ Falling stars canvas */
+    #starsCanvas{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index:0;
+    }
+
+    body{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 2;
+      background-color: rgba(255, 160, 200, 0.85);   /* light pink */
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(255,160,200,0.7);
+      width: 90%;
+      max-width: 350px;
+      text-align: center;
+      transition: transform 0.3s;
+      color:white;
+    }
+
+    .login-container:hover {
+      transform: scale(1.02);
+    }
+
+    .login-container h2 {
+      margin-bottom: 20px;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .login-container input[type="email"],
+    .login-container input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      outline:none;
+    }
+
+    .login-container input[type="submit"],
+    .login-container .home-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background 0.3s, transform 0.2s;
+      font-weight: bold;
+    }
+
+    .login-container input[type="submit"] {
+      background-color: #ff6fae;
+      color: white;
+    }
+
+    .login-container input[type="submit"]:hover,
+    .login-container .home-btn:hover {
+      background-color: #ff4f9a;
+      transform: translateY(-2px);
+    }
+
+    .login-container .home-btn {
+      background-color: white;
+      color: #ff4f9a;
+    }
+
+    .login-container p {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .login-container a {
+      color: #ffe1ef;
+      text-decoration: underline;
+      font-weight:bold;
+    }
+
+    .message {
+      margin-top: 5px;
+      padding: 5px 8px;
+      border-radius: 5px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .message.success {
+      background-color: rgba(255,255,255,0.25);
+      color: #ffffff;
+    }
+
+    .message.error {
+      background-color: rgba(255,0,90,0.35);
+      color: #fff3c4;
+    }
+
+    .show-pass {
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      user-select:none;
+    }
+
+    .show-pass input {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="starsCanvas"></canvas>
+
+  <div class="login-container">
+    <h2>SkillBarter Login</h2>
+
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required>
+      <div id="emailMessage" class="message"></div>
+
+      <input type="password" id="password" placeholder="Password" required>
+      <div id="passwordMessage" class="message"></div>
+
+      <label class="show-pass">
+        <input type="checkbox" id="showPass"> Show Password
+      </label>
+
+      <input type="submit" value="Login">
+    </form>
+
+    <button class="home-btn" onclick="window.location.href='home.html'">Go to Home</button>
+    <div id="loginMessage" class="message"></div>
+
+    <p>Don't have an account? <a href="register.html">Register</a></p>
+  </div>
+
+  <script>
+    /* ---------------- STAR FALLING BACKGROUND ---------------- */
+
+    const canvas = document.getElementById("starsCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const stars = [];
+    const STAR_COUNT = 120;
+
+    function createStar(){
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.8 + 0.6,
+        speed: Math.random() * 1.5 + 0.4,
+        alpha: Math.random() * 0.5 + 0.4
+      };
+    }
+
+    for(let i=0;i<STAR_COUNT;i++){
+      stars.push(createStar());
+    }
+
+    function drawStars(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      stars.forEach(s=>{
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(255,170,200,"+s.alpha+")";   // light pink stars
+        ctx.shadowColor = "rgba(255,150,200,0.9)";
+        ctx.shadowBlur = 8;
+        ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fill();
+
+        s.y += s.speed;
+
+        if(s.y > canvas.height){
+          s.y = -5;
+          s.x = Math.random() * canvas.width;
+        }
+      });
+
+      requestAnimationFrame(drawStars);
+    }
+
+    drawStars();
+
+
+    /* ---------------- LOGIN SCRIPT (UNCHANGED) ---------------- */
+
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const emailMessage = document.getElementById('emailMessage');
+    const passwordMessage = document.getElementById('passwordMessage');
+    const loginMessage = document.getElementById('loginMessage');
+    const showPass = document.getElementById('showPass');
+
+    showPass.addEventListener('change', () => {
+      passwordInput.type = showPass.checked ? 'text' : 'password';
+    });
+
+    emailInput.addEventListener('input', function() {
+      const emailValue = emailInput.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (emailValue.length === 0) {
+        emailMessage.style.display = 'none';
+      } else if (!emailRegex.test(emailValue)) {
+        emailMessage.textContent = 'Invalid email format!';
+        emailMessage.className = 'message error';
+        emailMessage.style.display = 'block';
+      } else {
+        emailMessage.textContent = 'Valid email!';
+        emailMessage.className = 'message success';
+        emailMessage.style.display = 'block';
+      }
+    });
+
+    passwordInput.addEventListener('input', function() {
+      const passValue = passwordInput.value.trim();
+
+      if (passValue.length === 0) {
+        passwordMessage.style.display = 'none';
+      } else if (passValue.length < 4) {
+        passwordMessage.textContent = 'Password too short (min 4 chars)';
+        passwordMessage.className = 'message error';
+        passwordMessage.style.display = 'block';
+      } else {
+        passwordMessage.textContent = 'Valid!';
+        passwordMessage.className = 'message success';
+        passwordMessage.style.display = 'block';
+      }
+    });
+
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (user) {
+        loginMessage.textContent = 'Welcome back, ' + user.name + '!';
+        loginMessage.className = 'message success';
+        loginMessage.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.replace('home.html');
+        }, 1000);
+
+      } else {
+        loginMessage.textContent = 'Invalid email or password!';
+        loginMessage.className = 'message error';
+        loginMessage.style.display = 'block';
+      }
+    });
+
+  </script>
+</body>
+</html>

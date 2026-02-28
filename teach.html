@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Teach</title>
+</head>
+<body style="text-align:center;margin-top:100px;">
+
+<h2>Publish a Skill</h2>
+
+<input id="title" placeholder="Skill Title"><br><br>
+<textarea id="content" placeholder="Write what you teach"></textarea><br><br>
+
+<button onclick="publish()">Publish</button>
+
+<p id="result"></p>
+
+<script>
+function publish(){
+    let title = document.getElementById("title").value;
+    let content = document.getElementById("content").value;
+
+    fetch("http://localhost:8080/teach",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:`title=${title}&content=${content}`
+    })
+    .then(res=>res.text())
+    .then(data=>{
+        document.getElementById("result").innerText=data;
+    });
+}
+</script>
+
+</body>
+</html>
